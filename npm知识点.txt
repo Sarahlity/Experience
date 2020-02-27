@@ -1,0 +1,86 @@
+npm版本更新的问题  什么样的update  什么样的 install最新版才可以
+
+答案:npm包版本 vue:^2.2.1  执行 update 会更新vue 2.x.x最新版本  若vue 3.0 只能手动更新install
+                          vue:~2.2.1 执行update 会更新vue 2.2.x 最新版本 
+                           npm install 更新全部对本地的package.json没有什么影响
+                          但尽量不要用install指定版本的方式 硬更新 避免出现 各个npm包间的兼容问题
+
+可执行 npm -g outdated 或者 npm outdated 去查看当前npm包可更新的的最新版本
+
+npm中涉及到的主体主要有两个：package和module，定义如下：
+
+package：含有package.json描述文件并发布到npm仓库的文件或者文件夹
+module：在node_modules中，可以被Node.js的require()方法加载的任何文件或文件夹
+可以这样理解：一个JavaScript软件，从本地发布到npm仓库时是package，从npm仓库下载到本地时就变成了module
+
+另外，基于以上，可以看出package和module的关系：
+
+module不一定是package（比如node内置模块），package一定是module
+含package.json文件的module一定是package
+
+npm发包流程
+unscoped包：
+npm login
+npm publish
+scoped包：
+基本流程同unscoped 不同点是 package.json 和 Accessibility（可访问性）加了作用域的包publish默认为private 收费 需要手动设置public
+npm init --scope=@moli33 -y  给npm包加作用域
+npm publish --access public 将作用域包设置成public
+
+1.npm账号注册 （想要发布npm包 注册账号必须经过注册邮箱验证）
+2.发布npm包
+npm官方建议规范的包至少包含：
+package.json（包的基本信息）
+README.md（文档）
+index.js （入口文件）通过module.exports 或者exports.XXX 暴露
+
+3.unscoped包和scoped包区别
+一旦注册个人或者团体账户，就获得了与个人或者团体名相匹配的scope，可以用这个scope作为包的命名空间，例如@moli33。
+unscoped包的包名必须是独一无二的 Accessibility（可访问性）的值为public
+scoped包是为了解决包重名的问题 这时候加个作用域可以正常发布 例如 包名babel不可以发布 但是加了作用域  @moli33/babel 可发布 默认private需要收费可更改
+
+4 npm 包更新
+npm采用语义化版本，共三位，以’.’隔开，从左至右依次代表：主版本（major）、次要版本（minor）、补丁版本（patch）
+以0.1.0 为例
+npm version patch    //package.josn版本变为 0.1.1
+npm version minor   //package.josn版本变为 0.2.0
+npm version major   // package.josn版本变为 1.0.0
+npm view @moli33/babel versions  //查看包的所以版本
+1修改npm包代码 按照上述版本更改package.json版本号 
+2 npm publish
+3 本地 npm up @moli33/babel 更新发布的包
+
+5 npm包废弃和删除
+废弃指定版本   // 依然可以下载使用 只是在安装的时候 报warn :deprecated 。。。。。。。。
+语法：npm deprecate <pkg>[@<version>] <message> 
+例如 npm deprecate @moli33/babel@0.1.0 'deprecate this version'
+
+npm做了相关的删除限制：
+
+删除的版本24小时后方可重发!
+包发布72小时之内才可删除!
+npm unpublish hello-moli-test --force
+本地卸载
+npm rm hello-moli-test
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+

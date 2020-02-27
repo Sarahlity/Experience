@@ -1,0 +1,86 @@
+git help -a 或者  git help -g 查看git命令
+git config user.name    git config user,email //查询当前git用户 用户名 密码
+
+git branch  //查看本地分支
+git branch -r  //查看所以远程分支
+git branch -a  //查看所有分支 包括本地分支和远程分支
+git checkout -b 分支名 //添加本地新分支   默认git pull远程分支的时候会在本地建立一个和拉取的远程分支同名的分支 并捆绑在一起  新建的分支需要 与远程分支捆绑
+git branch --set-upstream-to=origin/remote_branch  your_branch //其中，origin/remote_branch是你本地分支对应的远程分支；your_branch是你当前的本地分支。
+git checkout 分支名  //切换本地分支
+git checkout -b v1 origin/v1   // 切换远程分支,切换远程的v1分支到本地,本地分支名称叫v1  也可以只切换远程分支 不新建本地分支 -b v1 不要
+git push origin --delete dev  //删除远程分支  dev为分支名
+git push origin dev:dev  //添加远程分支 dev为分支名
+git branch -D dev  //删除本地分支  dev为分支名   -D 或者 -d
+git clone -b develop XXXX.git   //拉取XXXXgit项目分支 develop为分支名 不加分支直接clone 默认master
+git status //查询git文件状态
+git add XXX //添加XXX文件到暂存（ modified）
+git add .  //添加所以文件到暂存
+git reset  XXX// 取消文件暂存
+git reset //取消全部文件暂存
+git reset --hard 版本commit号   //还原代码至某个版本 # 版本commit号可用 git log命令查看， 如果不加commit号， 默认还原至上一个最近的版本
+git checkout XXX //检出XXX文件 若文件已经暂存并修改 还原到 暂存的初始状态 若文件没有暂存 文件还原到原始状态（放弃修改）
+git mv game gamesdk  //把game文件或文件夹 换成 gamesdk
+git commit XXX -m "描述" //提交XXX文件
+git commit -m "描述" //提交所以文件
+git push //提交全部文件到远程
+/******/
+git add  出现 warning: LF will be replaced by CRLF 的解决办法：   git config --global core.autocrlf false
+git config core.ignorecase false //git 默认会忽略大小写 因此 可以取消掉这个默认
+
+git pull遇到冲突 
+方法1  git reset 提示的冲突文件
+方法2  git stash  保存当前文件信息
+          git pull   拉取远程信息
+          git stash pop  弹出之前的修改 合并最近一次（当前冲突）文件 若没有冲突 自动合并文件  有冲突 页面会显示冲突信息 修改文件解决
+          git commit
+          git push
+
+添加gitignore不生效的方法
+git rm -r --cached .
+git add .
+git commit -m 'update .gitignore'
+git push
+
+针对某一个文件还原版本
+git log -- XXX文件  //查看XXX文件的历史版本记录
+git checkout 版本号 文件  //检出需要的版本号文件 对本地进行覆盖
+git commit -m "还原版本"  //提交
+
+vsCode 处理分支代码合并
+例如 develop 分支合并到master
+vsCode切换到master主分支 先git pull然后 git merge origin/develop 然后develop的代码会下载到本地  有冲突的代码会显示处理在合并文件那 并显示所以merge变动的代码  然后commit and push
+如果没有冲突 则直接 push到master
+
+如何恢复误提交的commit文件
+1 git log 查询 commit 提交记录
+2 找到误提交的commit 的hash值
+3 git reset --hard 哈希值
+
+代码还原某一版本
+git reset --hard  76895921d9247fa130e04299a552aad216fe1ccb  把代码更新到指定版本
+git reset --soft origin/develop   将代码切换到最新的分支上  但是本地代码已经是以前版本的了
+
+
+
+Commit message 的格式
+每次提交，Commit message 都包括三个部分：header，body 和 footer。 例如  fix($compile):add missing "a"
+用于说明 commit 的类别，只允许使用下面7个标识。
+
+build: 构建
+
+ci: 持续集成
+feat：新功能（feature）
+fix：修补bug
+perf: 优化相关，比如提升性能、体验
+docs：文档（documentation）
+revert: 回滚到上一个版本
+style： 格式（不影响代码运行的变动）
+refactor：重构（即不是新增功能，也不是修改bug的代码变动）
+test：增加测试
+chore：构建过程或辅助工具的变动
+bump: version 1.0.10 升到新版本
+
+
+
+
+

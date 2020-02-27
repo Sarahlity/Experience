@@ -1,0 +1,129 @@
+浏览器缓存    
+缓存在宏观上可以分成两类：私有缓存和共享缓存、
+微观上可以分下面四类：浏览器缓存 代理服务器缓存  网关缓存  数据库缓存
+
+缓存的目标：
+一个检索请求的成功响应: 对于 GET请求，响应状态码为：200，则表示为成功。一个包含例如HTML文档，图片，或者文件的响应；
+不变的重定向: 响应状态码：301；
+可用缓存响应：响应状态码：304，这个存在疑问，Chrome会缓存304中的缓存设置，Firefox；
+错误响应: 响应状态码：404 的一个页面；
+不完全的响应: 响应状态码 206，只返回局部的信息；
+除了 GET 请求外，如果匹配到作为一个已被定义的cache键名的响应；
+
+两个概念
+强缓存
+用户发送的请求，直接从客户端缓存中获取，不发送请求到服务器，不与服务器发生交互行为。
+例如：当浏览器再次试图访问这个CSS文件，发现有这个文件的缓存，那么就判断根据上一次的响应判断是否过期，如果没过期，使用缓存。加载文件
+协商缓存
+用户发送的请求，发送到服务器后，由服务器判定是否从缓存中获取资源。
+
+两者共同点：客户端获得的数据最后都是从客户端缓存中获得。
+两者的区别：从名字就可以看出，强缓存不与服务器交互，而协商缓存则需要与服务器交互。
+
+
+四个过程详解
+（a）浏览器判定是否有缓存
+先理解个概念，所谓“客户端缓存”就是指用户设备中本地资源。不同浏览器缓存文件的地址也不尽相同。
+浏览器怎么判定是否有缓  总结来说就是个查找文件是否存在的问题。
+（b）缓存是否过期
+客户端保留了一个服务器端的response header。里面的Date字段表明此次缓存时服务器的时间。
+里面有两个字段：expires 、Cache-Control
+
+expires
+Http1.0 中的标准，表明过期时间，注意此处的时间都是指的是服务器的时间。 存在的问题：服务器时间与客户端时间的不一致，就会导致缓存跟期待效果出现偏差。
+
+Cache-Control
+Http1.1 中的标准，可以看成是 expires 的补充。使用的是相对时间的概念。
+简单介绍下Cache-Control的属性设置。
+1）max-age: 设置缓存的最大的有效时间，单位为秒（s）。max-age会覆盖掉Expires
+2) s-maxage: 只用于共享缓存，比如CDN缓存（s -> share）。与max-age 的区别是：max-age用于普通缓存，
+而s-maxage用于代理缓存。如果存在s-maxage,则会覆盖max-age 和 Expires.
+3) public：响应会被缓存，并且在多用户间共享。默认是public。
+4) private: 响应只作为私有的缓存，不能在用户间共享。如果要求HTTP认证，响应会自动设置为private。
+5）no-cache:强制源服务器再次验证； 指定不缓存响应，表明资源不进行缓存。但是设置了no-cache之后并不代表浏览器不缓存，而是在缓存前要向服务器确认资源是否被更改。因此有的时候只设置no-cache防止缓存还是不够保险，还可以加上private指令，将过期时间设为过去的时间。
+6）no-store: 绝对禁止缓存。不缓存请求或是响应的任何内容
+7）must-revalidate: 如果页面过期，则去服务器进行获取。
+8）no-transform  代理不可更改媒体类型
+9）only-if-cached  从缓存获取
+10）cache-extension  新的指令标记(token)
+所以判断缓存是否过期步骤是：
+1） 查看是否有cache-control 的max-age / s-maxage , 如果有，则用服务器时间date值 + max-age/s-maxage 的秒数计算出新的过期时间，将当前时间与过期时间进行比较，判断是否过期
+2）查看是否有cache-control 的max-age / s-maxage，则用expires 作为过期时间比较
+
+总结：（b）过程执行完后，如果判定为未过期，则使用客户端缓存。那么就是属于“强缓存”。
+
+ Vary
+Vary: User-Agent   利用User-Agent字段来区分不同的客户端
+Vary: Accept-Encoding  源服务器启用了gzip压缩，但用户使用了比较旧的浏览器，不支持压缩，缓存服务器设定
+
+（c）跟服务器协商是否使用缓存
+到这一步的时候，浏览器会向服务器发送请求，同时如果上一次的缓存中有Last-modified 和 Etag 字段，
+浏览器将在request header 中加入If-Modified-Since（对应于Last-modified）， 和If-None-Match（对应于Etag）。
+
+Last-modified: 表明请求的资源上次的修改时间。
+If-Modified-Since：客户端保留的资源上次的修改时间。
+Etag：资源的内容标识。（不唯一，通常为文件的md5或者一段hash值，只要保证写入和验证时的方法一致即可）
+If-None-Match： 客户端保留的资源内容标识。
+利用这两个字段浏览器可以进入协商缓存阶段，当浏览器再次试图访问这个CSS文件，发现缓存过期，于是会在本次请求的请求头里携带If-Moified-Since和If-None-Match这两个字段，
+服务器通过这两个字段来判断资源是否有修改，如果有修改则返回状态码200和新的内容，如果没有修改返回状态码304，浏览器收到200状态码，该咋处理就咋处理(相当于首次访问这个文件了)，发现返回304，于是知道了本地缓存虽然过期但仍然可以用，于是加载本地缓存。
+然后根据新的返回的响应头来设置缓存。(这一步有所差异，发现不同浏览器的处理是不同的，chrome会为304设置缓存，firefox则不会)
+1） 分布式系统尽量关闭Etag，因为每台机器生成的Etag都不一样。
+2）分布式系统里多台机器间文件的Last-Modified必须一致，以免负载均衡不同导致对比失败。
+
+通常情况下，如果同时发送 If-None-Match 、If-Modified-Since字段，服务器只要比较etag 的内容即可，当然具体处理方式，看服务器的约定规则。
+
+（d）协商缓存
+在这个阶段，服务器一般会将Cache-control、expires 、last-modified、date、etag 等字段在response header 中返回，便于下次缓存。当然具体的场景，也是看服务器的约定规则设定。
+
+缓存的不同来源  
+from disk cache
+从磁盘中获取缓存资源，等待下次访问时不需要重新下载资源，而直接从磁盘中获取。它的直接操作对象为CurlCacheManager。
+from memory cache
+从内存中获取资源，等待下次访问时不需要重新下载资源，而直接从内存中获取。Webkit早已支持memoryCache。
+目前Webkit资源分成两类，一类是主资源，比如HTML页面，或者下载项，一类是派生资源，比如HTML页面中内嵌的图片或者脚本链接，分别对应代码中两个类：　　　　
+MainResourceLoader和SubresourceLoader。虽然Webkit支持memoryCache，但是也只是针对派生资源，它对应的类为CachedResource，用于保存原始数据（比如CSS，JS等），以及解码过的图片数据。
+Chrome会根据本地内存的使用率来决定缓存存放在哪，如果内存使用率很高，放在磁盘里面，内存的使用率很高会暂时放在内存里面。这就可以比较合理的解释了为什么同一个资源有时是from memory cache有时是from disk cache的问题了。
+
+区别
+当退出进程时，内存中的数据会被清空，而磁盘的数据不会，所以，当下次再进入该进程时，该进程仍可以从diskCache中获得数据，而memoryCache则不行。
+相似
+diskCache与memoryCache相似之处就是也只能存储一些派生类资源文件。它的存储形式为一个index.dat文件，记录存储数据的url，然后再分别存储该url的response信息和content内容。Response信息最大作用就是用于判断服务器上该url的content内容是否被修改。
+
+用户行为
+最后附上一张，用户行为影响浏览器的缓存行为。
+
+地址栏回车、页面链接跳转、新开窗口、前进后退    Expires/Cache-Control     Last-Modified/Etag  有效
+F5刷新      Expires/Cache-Control 无效    Last-Modified/Etag  有效
+Ctrl+F5     Expires/Cache-Control 无效    Last-Modified/Etag  无效
+
+缓存策略：
+1. 强缓存阶段
+2. 协商缓存阶段
+3.启发式缓存阶段：浏览器用来确定缓存过期时间的字段一个都没有 根据响应头中2个时间字段 Date 和 Last-Modified 之间的时间差值，取其值的10%作为缓存时间周期。
+
+
+
+HTTP报文是什么呢？就是HTTP报文，这是一个概念，主要由以下两部分构成：
+1 首部(header)：包含了很多字段，比如：cookie、缓存、报文大小、报文格式等等）；
+2 主体(body)：HTTP请求真正要传输的部分，比如：一个HTML文档，一个js文件；
+
+
+不能缓存的请求
+当然并不是所有请求都能被缓存。
+无法被浏览器缓存的请求：
+
+1）HTTP信息头中包含Cache-Control:no-cache，pragma:no-cache（HTTP1.0），或Cache-Control:max-age=0等告诉浏览器不用缓存的请求
+
+2）需要根据Cookie，认证信息等决定输入内容的动态请求是不能被缓存的
+
+3）经过HTTPS安全加密的请求（有人也经过测试发现，ie其实在头部加入Cache-Control：max-age信息，firefox在头部加入Cache-Control:Public之后，能够对HTTPS的资源进行缓存，参考《HTTPS的七个误解》）
+
+4）POST请求无法被缓存
+
+5）HTTP响应头中不包含Last-Modified/Etag，也不包含Cache-Control/Expires的请求无法被缓存
+
+
+参考资料
+https://www.cnblogs.com/jztan/p/8367384.html
+https://segmentfault.com/a/1190000009569701
+
