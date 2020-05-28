@@ -63,6 +63,9 @@ npm unpublish hello-moli-test --force
 本地卸载
 npm rm hello-moli-test
 
+*************初次使用npm或者yarn 需要配置path环境变量
+遇到的问题：初次用yarn安装vuecli  安装成功 但是vue命令不识别  解决方案：配置yarn环境变量
+
 
 
 

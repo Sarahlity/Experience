@@ -55,12 +55,22 @@ vsCode切换到master主分支 先git pull然后 git merge origin/develop 然后develop的代
 1 git log 查询 commit 提交记录
 2 找到误提交的commit 的hash值
 3 git reset --hard 哈希值
+4 git push -f
 
 代码还原某一版本
 git reset --hard  76895921d9247fa130e04299a552aad216fe1ccb  把代码更新到指定版本
 git reset --soft origin/develop   将代码切换到最新的分支上  但是本地代码已经是以前版本的了
 
+代码合并
+ 例如8.5-m1分支 合并 到release分支
+1、进入release分支 执行git pull （主要作用1是拉取最新代码 2是检索分支项）
+2、执行命令 git merge orgin/8.5-m1
+3、如果没冲突 直接git push 提交   如果有冲突 找到冲突文件 解决冲突  然后git add .    git commit   最后在git push
 
+.gitignore文件添加文件不生效方法（git对已追踪文件设置ignore无效，需要远程取消文件追踪在提交ignore文件）
+git rm -r --cached .
+git add .
+git commit -m 'update .gitignore'
 
 Commit message 的格式
 每次提交，Commit message 都包括三个部分：header，body 和 footer。 例如  fix($compile):add missing "a"
