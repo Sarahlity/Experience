@@ -1,0 +1,9 @@
+1.npm i --global --production windows-build-tools  以管理员身份安装   然后添加python环境变量到系统path （python安装路径获取  cmd执行   where python  我的路径是C:\Users\chend\.windows-build-tools\python27）
+2.卸载安装失败的node-sass    并重启电脑
+3.创建.npmrc文件 配置npm默认仓库
+
+phantomjs_cdnurl=http://cnpmjs.org/downloads
+sass_binary_site=https://npm.taobao.org/mirrors/node-sass/
+registry=https://registry.npm.taobao.org
+
+4.重新安装 node-sass  或者  npm install
