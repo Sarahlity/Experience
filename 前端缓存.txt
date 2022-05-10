@@ -82,7 +82,7 @@ from memory cache
 从内存中获取资源，等待下次访问时不需要重新下载资源，而直接从内存中获取。Webkit早已支持memoryCache。
 目前Webkit资源分成两类，一类是主资源，比如HTML页面，或者下载项，一类是派生资源，比如HTML页面中内嵌的图片或者脚本链接，分别对应代码中两个类：　　　　
 MainResourceLoader和SubresourceLoader。虽然Webkit支持memoryCache，但是也只是针对派生资源，它对应的类为CachedResource，用于保存原始数据（比如CSS，JS等），以及解码过的图片数据。
-Chrome会根据本地内存的使用率来决定缓存存放在哪，如果内存使用率很高，放在磁盘里面，内存的使用率很高会暂时放在内存里面。这就可以比较合理的解释了为什么同一个资源有时是from memory cache有时是from disk cache的问题了。
+Chrome会根据本地内存的使用率来决定缓存存放在哪，如果内存使用率很高，放在磁盘里面，内存的使用率不高会暂时放在内存里面。这就可以比较合理的解释了为什么同一个资源有时是from memory cache有时是from disk cache的问题了。
 
 区别
 当退出进程时，内存中的数据会被清空，而磁盘的数据不会，所以，当下次再进入该进程时，该进程仍可以从diskCache中获得数据，而memoryCache则不行。

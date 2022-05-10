@@ -1,0 +1,1 @@
+JSON.parse('false') //将字符串'false'转换成布尔值  解决Boolean('false')为true的问题 

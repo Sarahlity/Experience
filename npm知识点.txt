@@ -58,7 +58,7 @@ npm view @moli33/babel versions  //查看包的所以版本
 npm做了相关的删除限制：
 
 删除的版本24小时后方可重发!
-包发布72小时之内才可删除!
+包发布72小时之后才可删除!
 npm unpublish hello-moli-test --force
 本地卸载
 npm rm hello-moli-test

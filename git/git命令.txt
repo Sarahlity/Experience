@@ -19,7 +19,7 @@ git reset  XXX// 取消文件暂存
 git reset //取消全部文件暂存
 git reset --hard 版本commit号   //还原代码至某个版本 # 版本commit号可用 git log命令查看， 如果不加commit号， 默认还原至上一个最近的版本
 git checkout XXX //检出XXX文件 若文件已经暂存并修改 还原到 暂存的初始状态 若文件没有暂存 文件还原到原始状态（放弃修改）
-git mv game gamesdk  //把game文件或文件夹 换成 gamesdk
+git mv game gamesdk  //把game文件或文件夹 换成 gamesdk    然后 git commit    git  push
 git commit XXX -m "描述" //提交XXX文件
 git commit -m "描述" //提交所以文件
 git push //提交全部文件到远程
